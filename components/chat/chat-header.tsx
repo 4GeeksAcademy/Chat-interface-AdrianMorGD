@@ -1,13 +1,12 @@
 "use client"
 
-import { ChevronDown, PanelLeft, PanelRight } from "lucide-react"
+import { PanelLeft, PanelRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { MODELS, type ModelId } from "@/lib/chat-data"
 
 interface ChatHeaderProps {
   title: string
   model: ModelId
-  onModelChange: (model: ModelId) => void
   onToggleLeft: () => void
   onToggleRight: () => void
 }
@@ -15,7 +14,6 @@ interface ChatHeaderProps {
 export function ChatHeader({
   title,
   model,
-  onModelChange,
   onToggleLeft,
   onToggleRight,
 }: ChatHeaderProps) {
@@ -42,21 +40,9 @@ export function ChatHeader({
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="relative">
-          <select
-            value={model}
-            onChange={(e) => onModelChange(e.target.value as ModelId)}
-            aria-label="Select model"
-            className="h-8 appearance-none rounded-md border border-border bg-card pl-3 pr-8 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-          >
-            {Object.values(MODELS).map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.label}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-        </div>
+        <span className="rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium">
+          {MODELS[model].label}
+        </span>
         <Button
           size="icon"
           variant="ghost"

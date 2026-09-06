@@ -11,10 +11,8 @@ import { TokenSidebar } from "@/components/chat/token-sidebar"
 import {
   type Conversation,
   type Message,
-  type ModelId,
   INITIAL_CONVERSATIONS,
   estimateTokens,
-  generateReply,
 } from "@/lib/chat-data"
 
 export default function Page() {
@@ -51,11 +49,7 @@ export default function Page() {
     setShowLeft(false)
   }
 
-  function handleModelChange(model: ModelId) {
-    updateActive((c) => ({ ...c, model }))
-  }
-
-  function handleSend(text: string) {
+  async function handleSend(text: string) {
     const now = Date.now()
     const userMsg: Message = {
       id: crypto.randomUUID(),
@@ -75,14 +69,51 @@ export default function Page() {
     }))
     setPending(true)
 
-    window.setTimeout(() => {
-      const reply = generateReply(text)
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...active.messages, userMsg].map(({ role, content }) => ({
+            role,
+            content,
+          })),
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error ?? "Unable to get a response")
+      }
+
       const assistantMsg: Message = {
         id: crypto.randomUUID(),
         role: "assistant",
-        content: reply,
+        content: data.content,
         promptTokens: 0,
-        completionTokens: estimateTokens(reply),
+        completionTokens: data.usage.completion_tokens,
+        responseTimeMs: data.responseTimeMs,
+        tokensPerSecond: data.tokensPerSecond,
+        createdAt: Date.now(),
+      }
+      updateActive((c) => ({
+        ...c,
+        messages: c.messages.map((message) =>
+          message.id === userMsg.id
+            ? { ...message, promptTokens: data.usage.prompt_tokens }
+            : message,
+        ).concat(assistantMsg),
+        updatedAt: Date.now(),
+      }))
+    } catch (error) {
+      const assistantMsg: Message = {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content:
+          error instanceof Error
+            ? `Unable to reach Groq: ${error.message}`
+            : "Unable to reach Groq. Please try again.",
+        promptTokens: 0,
+        completionTokens: 0,
         createdAt: Date.now(),
       }
       updateActive((c) => ({
@@ -90,8 +121,9 @@ export default function Page() {
         messages: [...c.messages, assistantMsg],
         updatedAt: Date.now(),
       }))
+    } finally {
       setPending(false)
-    }, 900)
+    }
   }
 
   return (
@@ -111,7 +143,6 @@ export default function Page() {
         <ChatHeader
           title={active.title}
           model={active.model}
-          onModelChange={handleModelChange}
           onToggleLeft={() => setShowLeft(true)}
           onToggleRight={() => setShowRight(true)}
         />

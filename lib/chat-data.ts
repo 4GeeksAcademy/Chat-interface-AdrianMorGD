@@ -6,6 +6,8 @@ export interface Message {
   content: string
   promptTokens: number
   completionTokens: number
+  responseTimeMs?: number
+  tokensPerSecond?: number
   createdAt: number
 }
 
@@ -17,7 +19,7 @@ export interface Conversation {
   updatedAt: number
 }
 
-export type ModelId = "gpt-4o" | "claude-3.7-sonnet" | "gemini-2.0-flash"
+export type ModelId = "qwen/qwen3.8-27b"
 
 export interface ModelSpec {
   id: ModelId
@@ -29,26 +31,12 @@ export interface ModelSpec {
 }
 
 export const MODELS: Record<ModelId, ModelSpec> = {
-  "gpt-4o": {
-    id: "gpt-4o",
-    label: "GPT-4o",
-    contextWindow: 128_000,
-    inputPrice: 2.5,
-    outputPrice: 10,
-  },
-  "claude-3.7-sonnet": {
-    id: "claude-3.7-sonnet",
-    label: "Claude 3.7 Sonnet",
-    contextWindow: 200_000,
-    inputPrice: 3,
-    outputPrice: 15,
-  },
-  "gemini-2.0-flash": {
-    id: "gemini-2.0-flash",
-    label: "Gemini 2.0 Flash",
-    contextWindow: 1_000_000,
-    inputPrice: 0.1,
-    outputPrice: 0.4,
+  "qwen/qwen3.8-27b": {
+    id: "qwen/qwen3.8-27b",
+    label: "Qwen 3.8 27B",
+    contextWindow: 131_072,
+    inputPrice: 0,
+    outputPrice: 0,
   },
 }
 
@@ -122,7 +110,7 @@ export const INITIAL_CONVERSATIONS: Conversation[] = [
   {
     id: "c1",
     title: "Optimizing a Postgres query",
-    model: "claude-3.7-sonnet",
+    model: "qwen/qwen3.8-27b",
     updatedAt: now - 1000 * 60 * 12,
     messages: [
       mkMessage(
@@ -150,7 +138,7 @@ export const INITIAL_CONVERSATIONS: Conversation[] = [
   {
     id: "c2",
     title: "Product launch tweet variants",
-    model: "gpt-4o",
+    model: "qwen/qwen3.8-27b",
     updatedAt: now - 1000 * 60 * 60 * 4,
     messages: [
       mkMessage(
@@ -168,7 +156,7 @@ export const INITIAL_CONVERSATIONS: Conversation[] = [
   {
     id: "c3",
     title: "Explain vector embeddings",
-    model: "gemini-2.0-flash",
+    model: "qwen/qwen3.8-27b",
     updatedAt: now - 1000 * 60 * 60 * 27,
     messages: [
       mkMessage(
@@ -185,15 +173,3 @@ export const INITIAL_CONVERSATIONS: Conversation[] = [
   },
 ]
 
-const CANNED_REPLIES = [
-  "Here's how I'd approach that. First, break the problem into the smallest verifiable step, then confirm each assumption before moving on. That keeps the debugging loop tight and avoids chasing the wrong root cause.",
-  "Good question. The short answer is yes — but the trade-off is worth spelling out. You gain simplicity and speed up front, at the cost of some flexibility later. For most teams that's the right call until you hit real scale.",
-  "Let me walk through it. The key insight is that the bottleneck usually isn't where it feels like it is. Measure first, change one variable, measure again. Nine times out of ten the fix is smaller than expected.",
-  "I'd structure it in three parts: the data model, the access pattern, and the failure modes. Nail the access pattern first, because it dictates everything else — indexes, caching, and how you shard if you ever need to.",
-  "Absolutely. A clean way to do this is to keep the boundary explicit: validate and normalize input at the edge, then let the core logic assume everything is already well-formed. It makes the whole system much easier to reason about.",
-]
-
-export function generateReply(prompt: string): string {
-  const seed = prompt.length % CANNED_REPLIES.length
-  return CANNED_REPLIES[seed]
-}

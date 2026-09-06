@@ -1,7 +1,7 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 
-import { formatTime } from "./lib/chat-data.ts"
+import { formatTime } from "./lib/chat-data"
 
 test("formatTime uses UTC so server and client render the same timestamp", () => {
   const ts = Date.UTC(2026, 8, 5, 5, 15, 0)

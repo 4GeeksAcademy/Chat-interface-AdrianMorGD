@@ -1,6 +1,6 @@
 "use client"
 
-import { Coins, Cpu, Gauge, TrendingUp } from "lucide-react"
+import { Coins, Cpu, Gauge, Timer, TrendingUp } from "lucide-react"
 import {
   type Conversation,
   MODELS,
@@ -28,6 +28,9 @@ export function TokenSidebar({ conversation }: TokenSidebarProps) {
 
   const turns = messages.filter((m) => m.role === "assistant").length
   const avgOut = turns ? Math.round(completionTokens / turns) : 0
+  const lastResponse = [...messages]
+    .reverse()
+    .find((message) => message.role === "assistant" && message.responseTimeMs)
 
   return (
     <aside className="flex h-full w-full flex-col overflow-y-auto bg-sidebar">
@@ -94,6 +97,11 @@ export function TokenSidebar({ conversation }: TokenSidebarProps) {
             icon={<TrendingUp className="size-3.5" />}
             label="Avg out"
             value={`${formatTokens(avgOut)}`}
+          />
+          <StatCard
+            icon={<Timer className="size-3.5" />}
+            label="Last response"
+            value={lastResponse ? `${lastResponse.responseTimeMs} ms` : "--"}
           />
           <StatCard
             icon={<Gauge className="size-3.5" />}
