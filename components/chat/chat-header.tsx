@@ -18,7 +18,7 @@ export function ChatHeader({
   onToggleRight,
 }: ChatHeaderProps) {
   return (
-    <header className="flex items-center justify-between gap-3 border-b border-border bg-background/80 px-4 py-3 backdrop-blur md:px-6">
+    <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-background/80 px-4 py-3 backdrop-blur md:px-6">
       <div className="flex min-w-0 items-center gap-2">
         <Button
           size="icon"

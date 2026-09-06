@@ -127,9 +127,9 @@ export default function Page() {
   }
 
   return (
-    <main className="grid h-screen grid-cols-1 overflow-hidden bg-background lg:grid-cols-[18rem_1fr] xl:grid-cols-[18rem_1fr_20rem]">
+    <main className="grid h-screen min-h-0 grid-cols-1 overflow-hidden bg-background lg:grid-cols-[18rem_1fr] xl:grid-cols-[18rem_1fr_20rem]">
       {/* History panel — persistent on desktop */}
-      <div className="hidden border-r border-sidebar-border lg:block">
+      <div className="hidden min-h-0 border-r border-sidebar-border lg:block">
         <ConversationList
           conversations={conversations}
           activeId={activeId}
@@ -139,7 +139,7 @@ export default function Page() {
       </div>
 
       {/* Chat column */}
-      <div className="flex min-w-0 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-col">
         <ChatHeader
           title={active.title}
           model={active.model}
@@ -155,7 +155,7 @@ export default function Page() {
       </div>
 
       {/* Usage sidebar — persistent on wide screens */}
-      <div className="hidden border-l border-sidebar-border xl:block">
+      <div className="hidden min-h-0 border-l border-sidebar-border xl:block">
         <TokenSidebar conversation={active} />
       </div>
 

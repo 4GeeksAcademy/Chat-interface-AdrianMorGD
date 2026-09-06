@@ -22,7 +22,7 @@ export function MessageList({ messages, pending }: MessageListProps) {
   }, [messages.length, pending])
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
       <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-6 md:px-6">
         {messages.map((m) => (
           <MessageRow key={m.id} message={m} />
